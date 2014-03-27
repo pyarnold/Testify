@@ -5,6 +5,7 @@ MANIFEST
 *.pyc
 *~
 ._*
+*.bak
 *.sw[nop]
 *.egg-info
 tags
