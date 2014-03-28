@@ -13,8 +13,11 @@
 # limitations under the License.
 
 from __future__ import print_function
+from future.builtins import dict
+from future.builtins import range
 
 """This module contains the TestRunner class and other helper code"""
+from __future__ import absolute_import
 __author__ = "Oliver Nicholas <bigo@yelp.com>"
 __testify = 1
 
@@ -24,8 +27,8 @@ import functools
 import pprint
 import sys
 
-from test_case import MetaTestCase, TestCase
-import test_discovery
+from .test_case import MetaTestCase, TestCase
+from . import test_discovery
 
 
 class TestRunner(object):
@@ -77,8 +80,8 @@ class TestRunner(object):
     @classmethod
     def get_test_method_name(cls, test_method):
         return '%s %s.%s' % (
-            test_method.im_class.__module__,
-            test_method.im_class.__name__,
+            test_method.__self__.__class__.__module__,
+            test_method.__self__.__class__.__name__,
             test_method.__name__,
         )
 
@@ -113,9 +116,9 @@ class TestRunner(object):
 
             # Assign buckets round robin
             buckets = defaultdict(list)
-            for bucket, test_case in itertools.izip(
+            for bucket, test_case in zip(
                 itertools.cycle(
-                    range(self.bucket_count) + list(reversed(range(self.bucket_count)))
+                    list(range(self.bucket_count)) + list(reversed(list(range(self.bucket_count))))
                 ),
                 test_cases,
             ):
@@ -137,7 +140,7 @@ class TestRunner(object):
                 discovered_tests = discover_tests_by_buckets()
             else:
                 discovered_tests = discover_tests()
-        except test_discovery.DiscoveryError, exc:
+        except test_discovery.DiscoveryError as exc:
             for reporter in self.test_reporters:
                 reporter.test_discovery_failure(exc)
             sys.exit(1)
@@ -216,7 +219,7 @@ class TestRunner(object):
             for test_method in test_instance.runnable_test_methods():
                 for suite_name in test_instance.suites(test_method):
                     suites[suite_name].append(test_method)
-        suite_counts = dict((suite_name, "%d tests" % len(suite_members)) for suite_name, suite_members in suites.iteritems())
+        suite_counts = dict((suite_name, "%d tests" % len(suite_members)) for suite_name, suite_members in suites.items())
 
         pp = pprint.PrettyPrinter(indent=2)
         print(pp.pformat(dict(suite_counts)))

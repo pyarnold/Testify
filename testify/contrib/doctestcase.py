@@ -1,9 +1,13 @@
+from future.builtins import super
+from future import standard_library
+standard_library.install_hooks()
 import sys
 
 from doctest import DocTestFinder, DocTestRunner, REPORT_NDIFF
-from StringIO import StringIO
+from io import StringIO
 from testify import MetaTestCase, TestCase
 from types import MethodType
+from future.utils import with_metaclass
 
 class DocMetaTestCase(MetaTestCase):
     """See DocTestCase for documentation."""
@@ -22,7 +26,7 @@ class DocMetaTestCase(MetaTestCase):
         globs = dct.get('globs', None)
         extraglobs = dct.get('extraglobs', None)
 
-        if isinstance(module, basestring):
+        if isinstance(module, str):
             # transform a module name into a module
             module = sys.modules[module]
 
@@ -53,7 +57,7 @@ def run_test(doctest):
 
     assert runner.failures == 0, '\n' + summary.getvalue()
 
-class DocTestCase(TestCase):
+class DocTestCase(with_metaclass(DocMetaTestCase, TestCase)):
     """
     A testify TestCase that turns doctests into unit tests.
 
@@ -63,5 +67,4 @@ class DocTestCase(TestCase):
             A new copy of this dictionary is created for each test.
         extraglobs -- (optional) an extra set of global variables, which is merged into globs.
     """
-    __metaclass__ = DocMetaTestCase
     __test__ = False

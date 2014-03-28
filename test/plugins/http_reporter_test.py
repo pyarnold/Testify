@@ -1,8 +1,10 @@
+from future import standard_library
+standard_library.install_hooks()
 import threading
 import tornado.ioloop
 import tornado.httpserver
 import tornado.web
-import Queue
+import queue
 
 from test.test_logger_test import ExceptionInClassFixtureSampleTests
 from testify import assert_equal, assert_is, setup_teardown, TestCase
@@ -27,7 +29,7 @@ class HTTPReporterTestCase(TestCase):
     @setup_teardown
     def make_fake_server(self):
         self.results_reported = []
-        self.status_codes = Queue.Queue()
+        self.status_codes = queue.Queue()
 
         class ResultsHandler(tornado.web.RequestHandler):
             def post(handler):
@@ -37,7 +39,7 @@ class HTTPReporterTestCase(TestCase):
                 try:
                     status_code = self.status_codes.get_nowait()
                     handler.send_error(status_code)
-                except Queue.Empty:
+                except queue.Empty:
                     handler.finish("kthx")
 
             def get_error_html(handler, status, **kwargs    ):
@@ -62,7 +64,7 @@ class HTTPReporterTestCase(TestCase):
 
     def get_port_number(self, server):
         if hasattr(server, "_sockets"): # tornado > 2.0
-            _socket = server._sockets.values()[0]
+            _socket = list(server._sockets.values())[0]
         else: # tornado 1.2 or earlier
             _socket = server._socket
         return _socket.getsockname()[1]

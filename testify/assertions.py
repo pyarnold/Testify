@@ -13,6 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import with_statement
+from __future__ import division
+from future.builtins import round
+from future.builtins import dict
+from future.builtins import zip
+from future.builtins import str
 
 import contextlib
 from itertools import islice
@@ -202,9 +207,9 @@ def assert_raises_and_contains(expected_exception_class, strings, callable_obj, 
     """
     try:
         callable_obj(*args, **kwargs)
-    except expected_exception_class, e:
+    except expected_exception_class as e:
         message = str(e).lower()
-        if isinstance(strings, basestring):
+        if isinstance(strings, str):
             strings = [strings]
         for string in strings:
             assert_in(string.lower(), message)
@@ -618,7 +623,7 @@ def assert_dict_subset(left, right, message="expected [subset has:%(extra_left)r
         return
 
     extra_left = difference_dict
-    small_right = dict((k, right[k]) for k in right if k in left.keys())
+    small_right = dict((k, right[k]) for k in right if k in list(left.keys()))
     extra_right = _dict_subtract(small_right, left)
     raise AssertionError(message % {
         'left': left,
@@ -779,20 +784,20 @@ def assert_warns_such_that(warnings_test, callable=None, *args, **kwargs):
 
 def _to_characters(x):
     """Return characters that represent the object `x`, come hell or high water."""
-    if isinstance(x, unicode):
+    if isinstance(x, str):
         return x
     try:
-        return unicode(x, 'UTF-8')
+        return str(x, 'UTF-8')
     except UnicodeDecodeError:
-        return unicode(x, 'latin1')
+        return str(x, 'latin1')
     except TypeError:
         # We're only allowed to specify an encoding for str values, for whatever reason.
         try:
-            return unicode(x)
+            return str(x)
         except UnicodeDecodeError:
             # You get this (for example) when an error object contains utf8 bytes.
             try:
-                return unicode(str(x), 'UTF-8')
+                return str(str(x), 'UTF-8')
             except UnicodeDecodeError:
-                return unicode(str(x), 'latin1')
+                return str(str(x), 'latin1')
 # vim:et:sts=4:sw=4:

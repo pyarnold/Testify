@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2009 Yelp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,8 +22,8 @@ import time
 import traceback
 import types
 import unittest
-from test_case import MetaTestCase, TestifiedUnitTest
-from errors import TestifyError
+from .test_case import MetaTestCase, TestifiedUnitTest
+from .errors import TestifyError
 
 _log = logging.getLogger('testify')
 
@@ -53,11 +54,11 @@ def discover(what):
 
     def discover_inner(locator, suites=None):
         suites = suites or []
-        if isinstance(locator, basestring):
+        if isinstance(locator, str):
             import_error = None
             try:
                 test_module = __import__(locator)
-            except (ValueError, ImportError), e:
+            except (ValueError, ImportError) as e:
                 import_error = e
                 _log.info('discover_inner: Failed to import %s: %s' % (locator, e))
                 if os.path.isfile(locator) or os.path.isfile(locator+'.py'):
@@ -133,7 +134,7 @@ def discover(what):
             else:
                 for member_name in dir(test_module):
                     obj = getattr(test_module, member_name)
-                    if isinstance(obj, types.TypeType) and inspect.getmodule(obj) == test_module:
+                    if isinstance(obj, type) and inspect.getmodule(obj) == test_module:
                         for test_case_class in discover_inner(obj, suites=module_suites):
                             yield test_case_class
 

@@ -1,3 +1,8 @@
+from future.builtins import super
+from future.builtins import dict
+from future.builtins import open
+from future import standard_library
+standard_library.install_hooks()
 # Copyright 2009 Yelp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +30,7 @@ except ImportError:
 import yaml
 import time
 import threading
-import Queue
+import queue
 
 SA = None
 try:
@@ -36,7 +41,7 @@ except ImportError:
 from testify import test_reporter
 
 def md5(s):
-    return hashlib.md5(s.encode('utf8') if isinstance(s, unicode) else s).hexdigest()
+    return hashlib.md5(s.encode('utf8') if isinstance(s, str) else s).hexdigest()
 
 
 class SQLReporter(test_reporter.TestReporter):
@@ -67,7 +72,7 @@ class SQLReporter(test_reporter.TestReporter):
                 for row in self.conn.execute(self.Tests.select())
             )
 
-        self.result_queue = Queue.Queue()
+        self.result_queue = queue.Queue()
         self.ok = True
 
         self.reporting_frequency = options.sql_reporting_frequency
@@ -260,12 +265,12 @@ class SQLReporter(test_reporter.TestReporter):
             conn.execute(self.TestResults.insert(),
                 [self._create_row_to_insert(conn, result, result.get('previous_run_id', None)) for result in chunk]
             )
-        except Exception, e:
+        except Exception as e:
             logging.exception("Exception while reporting results: " + repr(e))
             self.ok = False
         finally:
             # Do this in finally so we don't hang at report() time if we get errors.
-            for _ in xrange(len(chunk)):
+            for _ in range(len(chunk)):
                 self.result_queue.task_done()
 
     def report_results(self):
@@ -282,18 +287,18 @@ class SQLReporter(test_reporter.TestReporter):
             try:
                 while True:
                     results.append(self.result_queue.get_nowait())
-            except Queue.Empty:
+            except queue.Empty:
                 pass
 
             # Insert any previous runs, if necessary.
-            for result in filter(lambda x: x['previous_run'], results):
+            for result in [x for x in results if x['previous_run']]:
                 try:
                     result['previous_run_id'] = self._insert_single_run(conn, result['previous_run'])
-                except Exception, e:
+                except Exception as e:
                     logging.exception("Exception while reporting results: " + repr(e))
                     self.ok = False
 
-            chunks = (results[i:i+self.batch_size] for i in xrange(0, len(results), self.batch_size))
+            chunks = (results[i:i+self.batch_size] for i in range(0, len(results), self.batch_size))
 
             for chunk in chunks:
                 self._report_results_by_chunk(conn, chunk)
@@ -325,7 +330,7 @@ def build_test_reporters(options):
     if options.reporting_db_config or options.reporting_db_url:
         if not SA:
             msg = 'SQL Reporter plugin requires sqlalchemy and you do not have it installed in your PYTHONPATH.\n'
-            raise ImportError, msg
+            raise ImportError(msg)
         return [SQLReporter(options)]
     return []
 

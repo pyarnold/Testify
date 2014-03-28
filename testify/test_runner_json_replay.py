@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+from future.builtins import super
+from future.builtins import open
 try:
     import simplejson as json
     _hush_pyflakes = [json]
@@ -8,7 +11,7 @@ except ImportError:
 import sys
 
 
-from test_runner import TestRunner
+from .test_runner import TestRunner
 
 class TestRunnerJSONReplay(TestRunner):
     """A fake test runner that loads a one-dict-per-line JSON file and sends each dict to the test reporters."""

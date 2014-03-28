@@ -1,3 +1,8 @@
+from future.builtins import super
+from future.builtins import range
+from future.builtins import str
+from future.builtins import chr
+from future.builtins import int
 # Copyright 2009 Yelp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -121,28 +126,28 @@ class TextTestLogger(TestLoggerBase):
                 output = subprocess.Popen(["tput", "colors"], stdout=subprocess.PIPE).communicate()[0]
                 if int(output.strip()) >= 8:
                     self.use_color = True
-            except Exception, e:
+            except Exception as e:
                 if self.options.verbosity >= VERBOSITY_VERBOSE:
                     self.writeln("Failed to find color support: %r" % e)
 
     def write(self, message):
         """Write a message to the output stream, no trailing newline"""
-        self.stream.write(message.encode('utf8') if isinstance(message, unicode) else message)
+        self.stream.write(message.encode('utf8') if isinstance(message, str) else message)
         self.stream.flush()
 
     def writeln(self, message):
         """Write a message and append a newline"""
-        self.stream.write("%s\n" % (message.encode('utf8') if isinstance(message, unicode) else message))
+        self.stream.write("%s\n" % (message.encode('utf8') if isinstance(message, str) else message))
         self.stream.flush()
 
-    BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(30, 38)
+    BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = list(range(30, 38))
 
     def _colorize(self, message, color = CYAN):
         if not color or not self.use_color:
             return message
         else:
-            start_color = chr(0033) + '[1;%sm' % color
-            end_color = chr(0033) + '[m'
+            start_color = chr(0o033) + '[1;%sm' % color
+            end_color = chr(0o033) + '[m'
             return start_color + message + end_color
 
     def test_discovery_failure(self, exc):
@@ -215,7 +220,7 @@ class TextTestLogger(TestLoggerBase):
         interrupted = results.get('interrupted', [])
         unknown = results.get('unknown', [])
 
-        test_method_count = sum(len(bucket) for bucket in results.values())
+        test_method_count = sum(len(bucket) for bucket in list(results.values()))
         test_word = "test" if test_method_count == 1 else "tests"
         case_word = "case" if test_case_count == 1 else "cases"
         overall_success = not failed and not unknown and not interrupted

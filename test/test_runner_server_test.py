@@ -1,3 +1,10 @@
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
+from future.builtins import dict
+from future.builtins import super
+from future import standard_library
+standard_library.install_hooks()
 import contextlib
 import logging
 import threading
@@ -5,8 +12,8 @@ import threading
 import mock
 import tornado.ioloop
 
-from discovery_failure_test import BrokenImportTestCase
-from test_logger_test import ExceptionInClassFixtureSampleTests
+from .discovery_failure_test import BrokenImportTestCase
+from .test_logger_test import ExceptionInClassFixtureSampleTests
 from testify import (
     assert_equal,
     assert_in,
@@ -113,7 +120,7 @@ class TestRunnerServerBaseTestCase(test_case.TestCase):
         def catch_exceptions_in_thread():
             try:
                 self.server.run()
-            except (Exception, SystemExit), exc:
+            except (Exception, SystemExit) as exc:
                 _log.error("Thread threw exception: %r" % exc)
                 raise
 
@@ -368,7 +375,7 @@ class TestRunnerServerTestCase(TestRunnerServerBaseTestCase):
         real_result = test_result.TestResult(self.dummy_test_case.test, runner_id='foo!')
         real_result.start()
         try:
-            print 1/0
+            print(1/0)
         except:
             import sys
             real_result.end_in_failure(sys.exc_info())
@@ -702,7 +709,7 @@ class TestRunnerServerFailureLimitClassTeardownErrorTestCase(TestRunnerServerFai
 def _replace_values_with_types(obj):
     # This makes it simple to compare the format of two dictionaries.
     if isinstance(obj, dict):
-        return dict((key, _replace_values_with_types(val)) for key, val in obj.items())
+        return dict((key, _replace_values_with_types(val)) for key, val in list(obj.items()))
     else:
         return type(obj).__name__
 

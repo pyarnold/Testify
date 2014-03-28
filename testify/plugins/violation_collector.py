@@ -1,3 +1,7 @@
+from future.builtins import dict
+from future.builtins import super
+from future.builtins import int
+from future.builtins import open
 import fcntl
 import itertools
 import json
@@ -63,7 +67,7 @@ def get_db_url(options):
 
 def is_sqlite_filepath(dburl):
     '''Check if dburl is an sqlite file path.'''
-    return type(dburl) in (str, unicode) and dburl.startswith('sqlite:///')
+    return type(dburl) in (str, str) and dburl.startswith('sqlite:///')
 
 
 def sqlite_dbpath(dburl):
@@ -75,7 +79,7 @@ def sqlite_dbpath(dburl):
 
 def cleandict(dictionary, allowed_keys):
     '''Cleanup the dictionary removing all keys but the allowed ones.'''
-    return dict((k, v) for k, v in dictionary.iteritems() if k in allowed_keys)
+    return dict((k, v) for k, v in dictionary.items() if k in allowed_keys)
 
 
 def writable_paths(options):
@@ -109,7 +113,7 @@ def writeln(msg, verbosity=None):
     global ctx
     verbosity =  verbosity or ctx.output_verbosity
     if ctx.output_stream and (verbosity <= ctx.output_verbosity):
-        msg = msg.encode('utf8') if isinstance(msg, unicode) else msg
+        msg = msg.encode('utf8') if isinstance(msg, str) else msg
         ctx.output_stream.write(msg + '\n')
         ctx.output_stream.flush()
 
@@ -130,7 +134,7 @@ def collect(syscall, path, resolved_path):
             'syscall_args': resolved_path,
             'start_time': time.time()
         })
-    except Exception, e:
+    except Exception as e:
         # No way to recover in here, just report error and violation
         sys.stderr.write('Error collecting violation data. Error %r. Violation: %r\n' % (e, (syscall, resolved_path)))
 
@@ -276,7 +280,7 @@ class ViolationStore(object):
             testinfo.update(self.info)
             result = self.conn.execute(self.Methods.insert(), testinfo)
             self._set_last_test_id(result.lastrowid)
-        except Exception, e:
+        except Exception as e:
             logging.error('Exception inserting testinfo: %r' % e)
 
     def add_violation(self, violation):
@@ -292,7 +296,7 @@ class ViolationStore(object):
             test_id = self.get_last_test_id()
             violation.update({'test_id': test_id})
             self.conn.execute(self.Violations.insert(), violation)
-        except Exception, e:
+        except Exception as e:
             logging.error('Exception inserting violations: %r' % e)
 
     def violation_counts(self):
@@ -417,19 +421,19 @@ def prepare_test_program(options, program):
     if options.catbox_violations:
         if not sys.platform.startswith('linux'):
             msg = 'Violation collection plugin is Linux-specific. Please either run your tests on Linux or disable the plugin.'
-            raise Exception, msg
+            raise Exception(msg)
         msg_pcre = '\nhttps://github.com/Yelp/catbox/wiki/Install-Catbox-with-PCRE-enabled\n'
         if not catbox:
             msg = 'Violation collection requires catbox and you do not have it installed in your PYTHONPATH.\n'
             msg += msg_pcre
-            raise ImportError, msg
+            raise ImportError(msg)
         if catbox and not catbox.has_pcre():
             msg = 'Violation collection requires catbox compiled with PCRE. Your catbox installation does not have PCRE support.'
             msg += msg_pcre
-            raise ImportError, msg
+            raise ImportError(msg)
         if not SA:
             msg = 'Violation collection requires sqlalchemy and you do not have it installed in your PYTHONPATH.\n'
-            raise ImportError, msg
+            raise ImportError(msg)
 
         ctx.output_stream = sys.stderr # TODO: Use logger?
         ctx.output_verbosity = options.verbosity

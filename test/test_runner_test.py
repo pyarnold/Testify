@@ -1,4 +1,7 @@
-import __builtin__
+from future.builtins import map
+from future import standard_library
+standard_library.install_hooks()
+import builtins
 import contextlib
 import imp
 import mock

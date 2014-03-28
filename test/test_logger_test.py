@@ -1,4 +1,7 @@
-import cStringIO
+from future.builtins import str
+from future import standard_library
+standard_library.install_hooks()
+import io
 
 from mock import patch
 
@@ -12,7 +15,7 @@ from testify.utils import turtle
 class TextLoggerBaseTestCase(TestCase):
     @setup
     def create_stream_for_logger(self):
-        self.stream = cStringIO.StringIO()
+        self.stream = io.StringIO()
 
     @setup
     def create_options_for_test_runner(self):

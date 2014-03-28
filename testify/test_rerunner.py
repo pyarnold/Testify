@@ -1,8 +1,11 @@
+from __future__ import absolute_import
+from future.builtins import super
+from future.builtins import open
 from itertools import groupby
 import sys
 
-import test_discovery
-from test_runner import TestRunner
+from . import test_discovery
+from .test_runner import TestRunner
 
 class TestRerunner(TestRunner):
     def __init__(self, *args, **kwargs):

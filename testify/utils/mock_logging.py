@@ -42,7 +42,7 @@ class MockHandler(logging.Handler):
                 assert_any_match_regex(log_regex, self.buf[level])
         else:
             assert self.buf, 'expected something to be logged'
-            assert_any_match_regex(log_regex, itertools.chain.from_iterable(self.buf.values()))
+            assert_any_match_regex(log_regex, itertools.chain.from_iterable(list(self.buf.values())))
 
     @contextmanager
     def assert_does_not_log(self, levels=None, log_regex=".*"):
@@ -72,7 +72,7 @@ class MockHandler(logging.Handler):
                 if level in self.buf:
                     assert_all_not_match_regex(log_regex, self.buf[level])
         else:
-            assert_all_not_match_regex(log_regex, itertools.chain.from_iterable(self.buf.values()))
+            assert_all_not_match_regex(log_regex, itertools.chain.from_iterable(list(self.buf.values())))
 
     def clear(self):
         """Clear all logged messages.

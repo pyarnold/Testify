@@ -45,7 +45,7 @@ class SQLReporterBaseTestCase(TestCase):
         """Make self.reporter, a SQLReporter that runs on an empty in-memory SQLite database."""
         if not SA:
             msg = 'SQL Reporter plugin requires sqlalchemy and you do not have it installed in your PYTHONPATH.\n'
-            raise ImportError, msg
+            raise ImportError(msg)
 
         parser = OptionParser()
         add_command_line_options(parser)
@@ -114,7 +114,7 @@ class SQLReporterTestCase(SQLReporterBaseTestCase):
         # Now that we've run the tests, get the build row again and check to see that things are updated.
         (updated_build,) = list(conn.execute(self.reporter.Builds.select()))
 
-        for key in updated_build.keys():
+        for key in list(updated_build.keys()):
             if key not in ('end_time', 'run_time', 'method_count'):
                 assert_equal(build[key], updated_build[key])
 
@@ -181,7 +181,7 @@ class SQLReporterTestCase(SQLReporterBaseTestCase):
         conn = self.reporter.conn
 
         test_case = DummyTestCase()
-        results = [TestResult(test_case.test_pass) for _ in xrange(3)]
+        results = [TestResult(test_case.test_pass) for _ in range(3)]
 
         previous_run = None
         for result in results:

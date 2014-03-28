@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import with_statement
+from __future__ import print_function
+from __future__ import absolute_import
+from future.builtins import int
+from future.builtins import open
 
 from collections import defaultdict
 from optparse import OptionParser
@@ -77,7 +81,7 @@ def load_plugins():
         for file_name in os.listdir(plugin_path):
 
             # For any file that we know how to load, try to import it
-            if any(file_name.endswith('.py') and not file_name.startswith('.') for suffix in suffix_map.iterkeys()):
+            if any(file_name.endswith('.py') and not file_name.startswith('.') for suffix in suffix_map.keys()):
                 full_file_path = os.path.join(plugin_path, file_name)
                 mod_name, suffix = os.path.splitext(file_name)
 
@@ -86,9 +90,9 @@ def load_plugins():
                         plugin_modules.append(imp.load_module(mod_name, file, full_file_path, suffix_map.get(suffix)))
                     except TypeError:
                         continue
-                    except ImportError, e:
-                        print >>sys.stderr, "Failed to import plugin %s: %r" % (full_file_path, e)
-                    except Exception, e:
+                    except ImportError as e:
+                        print("Failed to import plugin %s: %r" % (full_file_path, e), file=sys.stderr)
+                    except Exception as e:
                         raise Exception('whaa?: %r' % e)
     return plugin_modules
 
@@ -245,21 +249,21 @@ class TestProgram(object):
             bucket_overrides = get_bucket_overrides(self.other_opts.bucket_overrides_file)
 
         if self.other_opts.serve_port:
-            from test_runner_server import TestRunnerServer
+            from .test_runner_server import TestRunnerServer
             test_runner_class = TestRunnerServer
             self.test_runner_args['serve_port'] = self.other_opts.serve_port
         elif self.other_opts.connect_addr:
-            from test_runner_client import TestRunnerClient
+            from .test_runner_client import TestRunnerClient
             test_runner_class = TestRunnerClient
             self.test_runner_args['connect_addr'] = self.other_opts.connect_addr
             self.test_runner_args['runner_id'] = self.other_opts.runner_id
         elif self.other_opts.replay_json or self.other_opts.replay_json_inline:
-            from test_runner_json_replay import TestRunnerJSONReplay
+            from .test_runner_json_replay import TestRunnerJSONReplay
             test_runner_class = TestRunnerJSONReplay
             self.test_runner_args['replay_json'] = self.other_opts.replay_json
             self.test_runner_args['replay_json_inline'] = self.other_opts.replay_json_inline
         elif self.other_opts.rerun_test_file:
-            from test_rerunner import TestRerunner
+            from .test_rerunner import TestRerunner
             test_runner_class = TestRerunner
             self.test_runner_args['rerun_test_file'] = self.other_opts.rerun_test_file
         else:

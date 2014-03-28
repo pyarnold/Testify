@@ -1,3 +1,4 @@
+from __future__ import print_function
 #!/usr/local/bin/python
 
 __author__="lenza"
@@ -16,8 +17,8 @@ class FakeCoverage:
     @classmethod
     def start(cls):
         if not cls.warning_printed:
-            print >>sys.stderr, "*** WARNING: To gather coverage information you must install the Python coverage package."
-            print >>sys.stderr, "See: http://pypi.python.org/pypi/coverage/"
+            print("*** WARNING: To gather coverage information you must install the Python coverage package.", file=sys.stderr)
+            print("See: http://pypi.python.org/pypi/coverage/", file=sys.stderr)
             cls.warning_printed = True
 
     @staticmethod
@@ -30,7 +31,7 @@ try:
     import coverage
     _hush_pyflakes = [coverage]
     del _hush_pyflakes
-except (ImportError, NameError), ex:
+except (ImportError, NameError) as ex:
     coverage = None
 
 started = False
@@ -58,11 +59,11 @@ def stop():
 
 if __name__ == "__main__":
     if coverage is None:
-        print """You must install the Python coverage 3.0.b3 package to use coverage.\nhttp://pypi.python.org/pypi/coverage/"""
+        print("""You must install the Python coverage 3.0.b3 package to use coverage.\nhttp://pypi.python.org/pypi/coverage/""")
         quit()
 
     if len(sys.argv) < 2:
-        print "Usage: python code_coverage.py output_directory <diff>"
+        print("Usage: python code_coverage.py output_directory <diff>")
         quit()
 
     if len(sys.argv) > 2:

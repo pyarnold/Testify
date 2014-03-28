@@ -1,3 +1,5 @@
+from future.builtins import range
+from future.builtins import str
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import warnings
@@ -62,7 +64,7 @@ class AssertEqualTestCase(TestCase):
         try:
             assert_equal('that reviewboard differ is awesome',
                          'dat reviewboard differ is ozsom')
-        except AssertionError, e:
+        except AssertionError as e:
             assert_equal(expected, e.args[0])
         else:
             assert False, 'Expected `AssertionError`.'
@@ -143,7 +145,7 @@ class AssertEqualTestCase(TestCase):
     def test_assert_false(self):
         assert_false(None)
         assert_false(0)
-        assert_false(0L)
+        assert_false(0)
         assert_false(0.0)
         assert_false('')
         assert_false(())
@@ -613,7 +615,7 @@ class AssertDictSubsetTestCase(TestCase):
 
         try:
             assert_dict_subset(subset, superset)
-        except AssertionError, e:
+        except AssertionError as e:
             assert_equal(expected, e.args[0])
         else:
             assert_not_reached('AssertionError should have been raised')

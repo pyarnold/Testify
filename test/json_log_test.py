@@ -1,5 +1,7 @@
-import __builtin__
-import StringIO
+from future import standard_library
+standard_library.install_hooks()
+import builtins
+import io
 try:
     import simplejson as json
     _hush_pyflakes = [json]
@@ -45,19 +47,19 @@ class JSONReporterTestCase(test_case.TestCase):
         """Monkey patch `open` to point to a `StringIO()` at `self.log_file`
         and create a new `JSONReporter`.
         """
-        self._open = __builtin__.open
-        self.log_file = StringIO.StringIO()
+        self._open = builtins.open
+        self.log_file = io.StringIO()
         # Prevent the mock log file from being closed.
         self._log_file_close = self.log_file.close
         self.log_file.close = lambda: None
-        __builtin__.open = lambda *args: self.log_file
+        builtins.open = lambda *args: self.log_file
 
         self.json_reporter = json_log.JSONReporter(self.json_reporter_options)
 
     @teardown
     def teardown(self):
         """Restore `open` and close `self.log_file`."""
-        __builtin__.open = self._open
+        builtins.open = self._open
 
         self.log_file.close = self._log_file_close
         self.log_file.close()

@@ -82,7 +82,7 @@ class TestFixtures(object):
         wrapper._fixture_id = fixture._fixture_id
         wrapper._defining_class_depth = fixture._defining_class_depth
 
-        return instancemethod(wrapper, fixture.im_self, fixture.im_class)
+        return instancemethod(wrapper, fixture.__self__, fixture.__self__.__class__)
 
     @contextlib.contextmanager
     def class_context(self, setup_callbacks=None, teardown_callbacks=None):
@@ -163,7 +163,7 @@ class TestFixtures(object):
         # we end up with.
         def exit():
             try:
-                ctm.gen.next()
+                next(ctm.gen)
             except StopIteration:
                 pass
 

@@ -1,3 +1,4 @@
+from future.builtins import super
 import unittest
 
 from testify import assert_equal

@@ -1,3 +1,8 @@
+from __future__ import absolute_import
+from future.builtins import super
+from future.builtins import str
+from future import standard_library
+standard_library.install_hooks()
 """
 Client-server setup to evenly distribute tests across multiple processes. The server
 discovers all test classes and enqueues them, then clients connect to the server,
@@ -10,8 +15,8 @@ from __future__ import with_statement
 
 import logging
 
-from test_fixtures import FIXTURES_WHICH_CAN_RETURN_UNEXPECTED_RESULTS
-from test_runner import TestRunner
+from .test_fixtures import FIXTURES_WHICH_CAN_RETURN_UNEXPECTED_RESULTS
+from .test_runner import TestRunner
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
@@ -26,13 +31,13 @@ except ImportError:
     import json
 import logging
 
-import Queue
+import queue
 import time
 
 class AsyncDelayedQueue(object):
     def __init__(self):
-        self.data_queue = Queue.PriorityQueue()
-        self.callback_queue = Queue.PriorityQueue()
+        self.data_queue = queue.PriorityQueue()
+        self.callback_queue = queue.PriorityQueue()
         self.finalized = False
 
     def get(self, c_priority, callback, runner=None):
@@ -70,14 +75,14 @@ class AsyncDelayedQueue(object):
 
             try:
                 c_priority, callback, runner = self.callback_queue.get_nowait()
-            except Queue.Empty:
+            except queue.Empty:
                 break
 
             skipped_tests = []
             while data is None:
                 try:
                     d_priority, data = self.data_queue.get_nowait()
-                except Queue.Empty:
+                except queue.Empty:
                     break
 
                 if runner is not None and data.get('last_runner') == runner:
@@ -116,7 +121,7 @@ class AsyncDelayedQueue(object):
             while True:
                 _, callback, _ = self.callback_queue.get_nowait()
                 callback(None, None)
-        except Queue.Empty:
+        except queue.Empty:
             pass
 
 class TestRunnerServer(TestRunner):
@@ -249,7 +254,7 @@ class TestRunnerServer(TestRunner):
 
                 try:
                     self.report_result(runner_id, result)
-                except ValueError, e:
+                except ValueError as e:
                     return handler.send_error(409, reason=str(e))
 
                 return handler.finish("kthx")
@@ -266,7 +271,7 @@ class TestRunnerServer(TestRunner):
             discovered_tests = []
             try:
                 discovered_tests = self.discover()
-            except Exception, exc:
+            except Exception as exc:
                 _log.debug("Test discovery blew up!: %r" % exc)
                 raise
             for test_instance in discovered_tests:
@@ -467,7 +472,7 @@ class TestRunnerServer(TestRunner):
             pass
 
     def early_shutdown(self):
-        for class_path in self.checked_out.keys():
+        for class_path in list(self.checked_out.keys()):
             self.check_in_class(None, class_path, early_shutdown=True)
         self.shutdown()
 

@@ -1,8 +1,11 @@
-import httplib
+from future.builtins import super
+from future import standard_library
+standard_library.install_hooks()
+import http.client
 import logging
-import Queue
+import queue
 import threading
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 from testify import test_reporter
 
@@ -21,13 +24,13 @@ class HTTPReporter(test_reporter.TestReporter):
 
             try:
                 try:
-                    urllib2.urlopen('http://%s/results?runner=%s' % (self.connect_addr, self.runner_id), json.dumps(result))
-                except (urllib2.URLError, httplib.BadStatusLine), e:
+                    urllib.request.urlopen('http://%s/results?runner=%s' % (self.connect_addr, self.runner_id), json.dumps(result))
+                except (urllib.error.URLError, http.client.BadStatusLine) as e:
                     # Retry once.
-                    urllib2.urlopen('http://%s/results?runner=%s' % (self.connect_addr, self.runner_id), json.dumps(result))
-            except urllib2.HTTPError, e:
+                    urllib.request.urlopen('http://%s/results?runner=%s' % (self.connect_addr, self.runner_id), json.dumps(result))
+            except urllib.error.HTTPError as e:
                 logging.error('Skipping returning results for test %s because of error: %s' % (result['method']['full_name'], e.read()))
-            except Exception, e:
+            except Exception as e:
                 logging.error('Skipping returning results for test %s because of unknown error: %s' % (result['method']['full_name'], e))
 
             self.result_queue.task_done()
@@ -37,7 +40,7 @@ class HTTPReporter(test_reporter.TestReporter):
         self.connect_addr = connect_addr
         self.runner_id = runner_id
 
-        self.result_queue = Queue.Queue()
+        self.result_queue = queue.Queue()
         self.reporting_thread = threading.Thread(target=self.report_results)
         # A daemon thread should be fine, since the test_runner_client won't quit until the server goes away or says to quit.
         # In either of these cases, any outstanding results won't be processed anyway, so there's no reason for us to wait

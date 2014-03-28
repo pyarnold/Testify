@@ -18,6 +18,10 @@
 # TODO: finish doing the retry stuff for the inner clauses
 
 from __future__ import with_statement
+from __future__ import absolute_import
+from future.builtins import super
+from future.builtins import dict
+from future.utils import with_metaclass
 
 __author__ = "Oliver Nicholas <bigo@yelp.com>"
 __testify = 1
@@ -34,8 +38,8 @@ from testify.utils import class_logger
 from testify.test_fixtures import DEPRECATED_FIXTURE_TYPE_MAP
 from testify.test_fixtures import TestFixtures
 from testify.test_fixtures import suite
-from test_result import TestResult
-import deprecated_assertions
+from .test_result import TestResult
+from . import deprecated_assertions
 
 
 class MetaTestCase(type):
@@ -47,7 +51,7 @@ class MetaTestCase(type):
 
     def __new__(mcls, name, bases, dct):
         # This is the constructor for all TestCase *classes*.
-        for member_name, member in dct.iteritems():
+        for member_name, member in dct.items():
             if member_name.startswith('test') and isinstance(member, types.FunctionType):
                 if not hasattr(member, '_suites'):
                     member._suites = set()
@@ -73,7 +77,7 @@ class MetaTestCase(type):
         return cmp(MetaTestCase._cmp_str(cls), MetaTestCase._cmp_str(other))
 
 
-class TestCase(object):
+class TestCase(with_metaclass(MetaTestCase, object)):
     """The TestCase class defines test methods and fixture methods; it is the meat and potatoes of testing.
 
     QuickStart:
@@ -101,7 +105,6 @@ class TestCase(object):
             register_on_complete_test_method_callback
             register_on_run_test_method_callback
     """
-    __metaclass__ = MetaTestCase
     __test__ = False
 
     STAGE_UNSTARTED = 0
@@ -384,7 +387,7 @@ class TestifiedUnitTest(TestCase, unittest.TestCase):
             del default_test_case_dict[deprecated_fixture_name]
 
         # set testify defaults on the unittest class
-        for member_name, member in default_test_case_dict.iteritems():
+        for member_name, member in default_test_case_dict.items():
             unittest_dict.setdefault(member_name, member)
 
         # use an __init__ smart enough to figure out our inheritance
