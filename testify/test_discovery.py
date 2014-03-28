@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 # Copyright 2009 Yelp
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +12,7 @@ from __future__ import absolute_import
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+from __future__ import absolute_import
 import inspect
 import logging
 import os

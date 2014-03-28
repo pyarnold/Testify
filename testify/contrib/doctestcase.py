@@ -6,7 +6,6 @@ import sys
 from doctest import DocTestFinder, DocTestRunner, REPORT_NDIFF
 from io import StringIO
 from testify import MetaTestCase, TestCase
-from types import MethodType
 from future.utils import with_metaclass
 
 class DocMetaTestCase(MetaTestCase):
@@ -45,10 +44,11 @@ class DocMetaTestCase(MetaTestCase):
         testname = doctest.name.replace('.', ':')
         test.__name__ = doctest.name = testname
 
-        test = MethodType(test, None, cls)
-        vars(test)['_suites'] = set()
-
-        setattr(cls, test.__name__, test)
+        # FIXME this is py3 now?
+        # test = instancemethod(test, None, cls)
+        # vars(test)['_suites'] = set()
+        # setattr(cls, test.__name__, test)
+        cls.test = test.__get__(None, cls)
 
 def run_test(doctest):
     summary = StringIO()

@@ -1,6 +1,6 @@
+from __future__ import with_statement
 from future.builtins import open
 from future.builtins import str
-from __future__ import with_statement
 
 import logging
 import os

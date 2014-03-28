@@ -1,5 +1,5 @@
-from __future__ import print_function
 #!/usr/local/bin/python
+from __future__ import print_function
 
 __author__="lenza"
 __date__ ="$May 25, 2009"

@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 from future.builtins import dict
 from future.builtins import range
 
 """This module contains the TestRunner class and other helper code"""
-from __future__ import absolute_import
 __author__ = "Oliver Nicholas <bigo@yelp.com>"
 __testify = 1
 

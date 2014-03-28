@@ -1,8 +1,3 @@
-from __future__ import absolute_import
-from future.builtins import super
-from future.builtins import str
-from future import standard_library
-standard_library.install_hooks()
 """
 Client-server setup to evenly distribute tests across multiple processes. The server
 discovers all test classes and enqueues them, then clients connect to the server,
@@ -10,9 +5,11 @@ receive tests to run, and send back their results.
 
 The server keeps track of the overall status of the run and manages timeouts and retries.
 """
-
-from __future__ import with_statement
-
+from __future__ import absolute_import, with_statement
+from future.builtins import super
+from future.builtins import str
+from future import standard_library
+standard_library.install_hooks()
 import logging
 
 from .test_fixtures import FIXTURES_WHICH_CAN_RETURN_UNEXPECTED_RESULTS

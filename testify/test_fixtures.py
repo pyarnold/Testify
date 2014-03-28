@@ -2,7 +2,6 @@ __testify =1
 import contextlib
 import inspect
 import sys
-from new import instancemethod
 
 from testify.utils import inspection
 from testify.test_result import TestResult
@@ -82,7 +81,7 @@ class TestFixtures(object):
         wrapper._fixture_id = fixture._fixture_id
         wrapper._defining_class_depth = fixture._defining_class_depth
 
-        return instancemethod(wrapper, fixture.__self__, fixture.__self__.__class__)
+        return wrapper.__get__(fixture.__self__, fixture.__self__.__class__)
 
     @contextlib.contextmanager
     def class_context(self, setup_callbacks=None, teardown_callbacks=None):
@@ -286,7 +285,7 @@ class TestFixtures(object):
 
                 # we grabbed this from the class and need to bind it to the
                 # test case
-                instance_method = instancemethod(unbound_method, test_case, test_case.__class__)
+                instance_method = unbound_method.__get__(test_case, test_case.__class__)
                 all_fixtures[instance_method._fixture_type].append(instance_method)
 
         class_level = ['class_setup', 'class_teardown', 'class_setup_teardown']

@@ -1,7 +1,7 @@
+from __future__ import with_statement
 from future.builtins import range
 from future.builtins import str
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 import warnings
 
 from testify import TestCase

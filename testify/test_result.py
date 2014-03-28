@@ -14,8 +14,7 @@
 
 
 """This module contains the TestResult class, each instance of which holds status information for a single test method."""
-from __future__ import division
-from __future__ import print_function
+from __future__ import division, print_function
 from future.builtins import super
 __testify = 1
 import datetime
